@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Fragment } from "react";
@@ -364,7 +364,7 @@ const PDFReport = () => {
     const orientation = "portrait";
     // Object.keys(response[0]).length < 7 ? "portrait" : "landscape"; // portrait or landscape
     const doc = new jsPDF(orientation, unit, size);
-    doc.setFontSize(15);
+
     const title = "Inventory Management System";
     const address = "Shankhamul Kathmandu";
     const report = "Purchase Order Report (Summary)";
@@ -372,37 +372,55 @@ const PDFReport = () => {
     const printedBy = "Printed By: Meraki Techs";
     const dateRange = "Date Range:";
     const adDate = `${new Date().toLocaleString()} to ${new Date().toLocaleString()}`;
-    doc.text(title, 180, 42);
-    doc.text(address, 186, 58);
-    doc.text(report, 180, 74).setFontSize(10);
-    doc.text(currentDate, 350, 100);
-    doc.text(printedBy, 350, 110);
-    doc.text(dateRange, 40, 100);
-    doc.text(adDate, 40, 120);
 
     const table = document.getElementById("table");
+    const totalPagesExp = "{total_pages_count_string}";
     autoTable(doc, {
-      startY: 150,
       theme: "grid",
       html: table,
       columnStyles: {
         0: { halign: "center" },
       },
+      didDrawPage: function (data) {
+        // header
+        doc.setFontSize(15);
+        doc.text(title, 180, 42);
+        doc.text(address, 186, 58);
+        doc.text(report, 180, 74).setFontSize(10);
+        doc.text(currentDate, 350, 100);
+        doc.text(printedBy, 350, 110);
+        doc.text(dateRange, 40, 100);
+        doc.text(adDate, 40, 120);
+        // footer
+        let str = "Page " + doc.internal.getNumberOfPages();
+        // Total page number plugin only available in jspdf v1.0+
+        if (typeof doc.putTotalPages === "function") {
+          str = str + " of " + totalPagesExp;
+        }
+        doc.setFontSize(10);
+        // jsPDF 1.4+ uses getWidth, <1.4 uses .width
+        const pageSize = doc.internal.pageSize;
+        const pageHeight = pageSize.height
+          ? pageSize.height
+          : pageSize.getHeight();
+        doc.text(str, data.settings.margin.left, pageHeight - 10);
+      },
+      margin: { top: 130 },
       didParseCell(data) {
         const rows = data.table.body;
         if (
-          data.cell.text == "S.N" ||
-          data.cell.text == "Name" ||
-          data.cell.text == "Color" ||
-          data.cell.text == "Body" ||
-          data.cell.text == "Display" ||
-          data.cell.text == "Price" ||
+          data.cell.text === "S.N" ||
+          data.cell.text === "Name" ||
+          data.cell.text === "Color" ||
+          data.cell.text === "Body" ||
+          data.cell.text === "Display" ||
+          data.cell.text === "Price" ||
           againUpdated.includes(data.row.index)
         ) {
           data.cell.styles.fontStyle = "bold";
           data.cell.styles.halign = "center";
         } else if (
-          data.row.index == rows.length - 1 &&
+          data.row.index === rows.length - 1 &&
           data.cell.text[0].includes("Rs")
         ) {
           data.cell.styles.fontStyle = "bold";
@@ -410,13 +428,22 @@ const PDFReport = () => {
         }
       },
     });
+    // Total page number plugin only available in jspdf v1.0+
+    if (typeof doc.putTotalPages === "function") {
+      doc.putTotalPages(totalPagesExp);
+    }
 
     doc.save("test.pdf");
   };
 
   return (
     <div>
-      <button onClick={() => getReport()}>Generate Report</button>
+      <button className="btn btn-primary mt-5 ml-5" onClick={() => getReport()}>
+        Generate PDF Report
+      </button>
+      <button className="btn btn-primary mt-5 ml-5" onClick={() => getReport()}>
+        Generate Excel Report
+      </button>
       <table id="table" className="table grid" style={{ display: "none" }}>
         <thead>
           <tr>
