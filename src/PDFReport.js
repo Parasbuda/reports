@@ -2,6 +2,7 @@ import React from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Fragment } from "react";
+import XLSX from "xlsx";
 const purchaseOrder = [
   {
     id: 1,
@@ -381,6 +382,9 @@ const PDFReport = () => {
       columnStyles: {
         0: { halign: "center" },
       },
+      headStyles: {
+        fillColor: [255,0,0],
+      },
       didDrawPage: function (data) {
         // header
         doc.setFontSize(15);
@@ -436,16 +440,26 @@ const PDFReport = () => {
     doc.save("test.pdf");
   };
 
+  const getExcel = () => {
+    const table = document.getElementById("table");
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet JS" });
+    return XLSX.writeFile(wb, null || "report.xlsx");
+  };
   return (
     <div>
-      <button className="btn btn-primary mt-5 ml-5" onClick={() => getReport()}>
+      <button className="btn btn-primary mt-5 ml-5" onClick={getReport}>
         Generate PDF Report
       </button>
-      <button className="btn btn-primary mt-5 ml-5" onClick={() => getReport()}>
+      <button className="btn btn-primary mt-5 ml-5" onClick={getExcel}>
         Generate Excel Report
       </button>
-      <table id="table" className="table grid" style={{ display: "none" }}>
+      <table id="table" className="table grid">
         <thead>
+          {/* <tr>
+            <th colSpan={10} alignHorizontal="center">
+              Inventory Management System
+            </th>
+          </tr> */}
           <tr>
             <th>S.N</th>
             <th>Item</th>
