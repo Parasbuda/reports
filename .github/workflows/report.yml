@@ -26,9 +26,9 @@ jobs:
         cache: 'yarn'
     - run: yarn install
     - run: yarn run build 
-    - uses: JamesIves/github-pages-deploy-action@4.1.1
-      with: 
-        branch: gh-pages
-        folder: build
+    - uses: JamesIves/github-pages-deploy-action@v4.2.2
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: build # The folder the action should deploy.
     
-    
+
