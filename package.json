@@ -1,4 +1,5 @@
 {
+  "homepage": "https://Parasbuda.github.io/report",
   "name": "report",
   "version": "0.1.0",
   "private": true,
@@ -7,6 +8,7 @@
     "@testing-library/react": "^12.0.0",
     "@testing-library/user-event": "^13.2.1",
     "bootstrap": "4.5.3",
+    "gh-pages": "^3.2.3",
     "jspdf": "^2.5.0",
     "jspdf-autotable": "^3.5.23",
     "react": "^17.0.2",
@@ -17,6 +19,8 @@
     "xlsx-style": "^0.8.13"
   },
   "scripts": {
+    "predeploy":"yarn run build",
+    "deploy":"gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
